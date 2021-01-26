@@ -12,25 +12,32 @@ import sys
 LIB_ROOT = os.path.abspath(os.path.join(__file__, os.pardir, os.pardir))  
 if os.getcwd() != LIB_ROOT:
     os.chdir(LIB_ROOT)
-if LIB_ROOT not in sys.path:
-    sys.path.append(LIB_ROOT)
 
 tests_require = []
 
+def path_to_abs(path):
+    return os.path.join(LIB_ROOT,path)
+
 if sys.version < '2.7':
     tests_require.append('unittest2')
-
+    
 uclmodule = Extension(
     'ucl',
     libraries=['ucl', 'curl'],
-    sources=['python/src/uclmodule.c'],
-    include_dirs=['include'],
+#     sources=['src/uclmodule.c'],
+    sources=[path_to_abs('python/src/uclmodule.c')],
+    include_dirs=[path_to_abs('include')],
     language='c',
 )
 
 ucl_lib = {
-    'sources': ['src/' + fn for fn in os.listdir('src') if fn.endswith('.c')],
-    'include_dirs': ['include', 'src', 'uthash', 'klib'],
+    'sources': [path_to_abs('src/' + fn) for fn in os.listdir('src') if fn.endswith('.c')],
+    'include_dirs': [
+        path_to_abs('include'), 
+        path_to_abs('src'), 
+        path_to_abs('uthash'), 
+        path_to_abs('klib')
+    ],
     'macros': [('CURL_FOUND', '1')],
 }
 
@@ -40,9 +47,9 @@ template = 'python/MANIFEST.in'
 
 # distutils assume setup.py is in the root of the project
 # we need to include C source from the parent so trick it
-in_ucl_root = 'setup.py' in os.listdir('python')
-if in_ucl_root:
-    os.link('python/setup.py', 'setup.py')
+# in_ucl_root = 'setup.py' in os.listdir('python')
+# if in_ucl_root:
+#     os.link('python/setup.py', 'setup.py')
 
 setup(
     name = 'ucl',
@@ -71,5 +78,5 @@ setup(
 )
 
 # clean up the trick after the build
-if in_ucl_root:
-    os.unlink("setup.py")
+# if in_ucl_root:
+#     os.unlink("setup.py")
