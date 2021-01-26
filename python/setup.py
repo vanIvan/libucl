@@ -28,6 +28,7 @@ uclmodule = Extension(
     sources=[path_to_abs('python/src/uclmodule.c')],
     include_dirs=[path_to_abs('include')],
     language='c',
+    extra_link_args=['-L/usr/lib/x86_64-linux-gnu/']
 )
 
 ucl_lib = {
